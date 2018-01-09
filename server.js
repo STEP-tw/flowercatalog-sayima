@@ -103,6 +103,12 @@ const handlerForGetGuestBook = function(req,res){
   let commentsFileContent=fs.readFileSync('comments.json','utf8');
   comments=getAllComments(commentsFileContent);
   const newfileContent=fileContent.replace(/USER_COMMENT/,comments);
+  if(req.user){
+    let fileData=newfileContent.replace(/User/,req.user.userName);
+    res.write(fileData);
+    res.end();
+    return;
+  }
   res.write(newfileContent);
   res.end();
 };
@@ -113,17 +119,6 @@ const addToDataBase=function(commentsDetails){
   let commentsData=toS(commentsAsJSON);
   fs.writeFileSync('./comments.json',commentsData);
 };
-
-
-const parseUserData = function(userData){
-  console.log('in parser');
-  let commentAndName={};
-  let commentParameter=userData.split('&');
-  commentAndName.name=commentParameter[0].split('=')[1].split('+').join(' ');
-  commentAndName.comment=commentParameter[1].split('=')[1].split('+').join(' ');
-  return commentAndName;
-};
-
 
 const addUserData = function(req){
   let commentAndName=req.body;
