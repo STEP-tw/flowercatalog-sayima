@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Flower Catalog Website</title>
+<link rel="stylesheet" href="/css/mainStyle.css">
+</head>
+<body>
+  <h1 ><a href="index.html"><<</a>Guest Book</h1>
+  <hr>
+  <div class='content'>
+    <h2>Leave a Comment</h2>
+
+    <form id='commentform' action='guestbook' method='post'>
+  Name:<br>
+  <input type="text" id="name" name="name" required>
+  <br>
+  Comment:<br>
+  <textarea id="comment" name="comment" rows="10" cols="30" required>
+</textarea>
+  <br><br>
+  <button id='submit'>Submit</button>
+</form>
+<hr>
+<div id='commentDiv'>
+  USER_COMMENT
+</div>
+
+  <br>
+<hr>
+  </div>
+  </body>
+</html>

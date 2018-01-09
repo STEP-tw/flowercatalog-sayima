@@ -1,0 +1,52 @@
+body {
+  margin: 50px;
+}
+
+h1 {
+  text-align: center;
+  color:orange;
+}
+
+h3 {
+  text-align: right;
+  color: orange;
+}
+
+.imageRow {
+    display: table;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.image {
+    float: left;
+    padding: 0px;
+    margin-right: 2px;
+}
+
+.link {
+    float: right;
+    width: 20%;
+    padding: 1px;
+    padding-top: 300px;
+}
+
+#Abelio {
+  padding-top:250px;
+  width:60%;
+  margin :10px;
+  float :left;
+}
+
+#ageratum {
+  width:30%;
+  padding-top:100px;
+  float:left;
+  margin-left:10px;
+
+}
+
+#commentDiv{
+    margin-bottom: 10px;
+    overflow: scroll;
+}
