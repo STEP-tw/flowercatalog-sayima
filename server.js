@@ -6,19 +6,16 @@ let toS = o=>JSON.stringify(o,null,2);
 
   const registered_users=[
     {
-      "userName" : "sayima",
-      "password" : "12345"
-
+      'userName' : "sayima",
+      'password' : "12345"
     },
     {
-      "userName" : "pragya",
-      "password" : "12345"
-
+      'userName' : "pragya",
+      'password' : "12345"
     }
   ];
 
-const getAllComments = function(){
-  let commentsFileContent=fs.readFileSync('comments.json','utf8');
+const getAllComments = function(commentsFileContent=fs.readFileSync('comments.json','utf8')){
   let commentsData=JSON.parse(commentsFileContent);
   let content=`<pre>`;
   commentsData.map(function(element){
@@ -45,10 +42,8 @@ let logRequest = (req,res)=>{
 };
 
 let loadUser = (req,res)=>{
-  let sessionid = req.headers.cookie;
-  console.log("=====>sessionid:",sessionid);
+  let sessionid = req.cookies.sessionid;
   let user = registered_users.find(u=>u.sessionid==sessionid);
-  console.log("=====>user:",user);
   if(sessionid && user){
     req.user = user;
   }
@@ -103,10 +98,11 @@ const setSessionIdForUser= function(user,sessionid){
 };
 
 const handlerForGetGuestBook = function(req,res){
-
   res.writeHead(200,{'Content-Type':'text/html'});
   let fileContent=fs.readFileSync('./public/guestbook.html','utf8');
-  const newfileContent=fileContent.replace(/USER_COMMENT/,allComments);
+  let commentsFileContent=fs.readFileSync('comments.json','utf8');
+  comments=getAllComments(commentsFileContent);
+  const newfileContent=fileContent.replace(/USER_COMMENT/,comments);
   res.write(newfileContent);
   res.end();
 };
@@ -114,12 +110,13 @@ const addToDataBase=function(commentsDetails){
   let commentsFileContent=fs.readFileSync('comments.json','utf8');
   let commentsAsJSON=JSON.parse(commentsFileContent);
   commentsAsJSON.unshift(commentsDetails);
-  let commentsData=JSON.stringify(commentsAsJSON,null,2);
+  let commentsData=toS(commentsAsJSON);
   fs.writeFileSync('./comments.json',commentsData);
 };
 
 
 const parseUserData = function(userData){
+  console.log('in parser');
   let commentAndName={};
   let commentParameter=userData.split('&');
   commentAndName.name=commentParameter[0].split('=')[1].split('+').join(' ');
@@ -129,15 +126,9 @@ const parseUserData = function(userData){
 
 
 const addUserData = function(req){
-  let userData='';
-  request.on('data',function(text){
-    userData+=text;
-  });
-  request.on('end',function(){
-    let commentAndName=parseUserData(userData);
-    commentAndName.date=new Date().toLocaleString();
-    addToDataBase(commentAndName);
-  });
+  let commentAndName=req.body;
+  commentAndName.date=new Date().toLocaleString();
+  addToDataBase(commentAndName);
 };
 
 const handlePostGuestBook = function(req,res){
@@ -146,10 +137,11 @@ const handlePostGuestBook = function(req,res){
     res.redirect('/login.html');
     return;
   }
-  console.log(req.user);
+  console.log('req.user:',req.user);
+  console.log('data:',req.body);
   addUserData(req);
-  response.writeHead(302,{'Content-Type':'text/html','Location':'guestbook.html'});
-  response.end();
+  res.writeHead(302,{'Content-Type':'text/html','Location':'guestbook.html'});
+  res.end();
 
 };
 
@@ -168,7 +160,6 @@ app.get('/',handleSlash);
 
 app.post('/login',(req,res)=>{
   let user = registered_users.find(u=>u.userName==req.body.userName);
-  console.log(user);
   if(!user) {
     res.setHeader('Set-Cookie',`logInFailed=true`);
     res.redirect('/login.html');
@@ -177,8 +168,6 @@ app.post('/login',(req,res)=>{
   let sessionid = new Date().getTime();
   user.sessionid = sessionid;
   res.setHeader('Set-Cookie',`sessionid=${sessionid}`);
-  // setSessionIdForUser(user,sessionid);
-  console.log(registered_users);
   res.redirect('/guestbook.html');
 });
 

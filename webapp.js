@@ -19,23 +19,43 @@ let urlIsOneOf = function(urls){
   return urls.includes(this.url);
 };
 
-const toKeyValue =(obj,kv)=>{
-  let parts = kv.split('=');
-  obj[parts[0].trim()] = parts[1].trim();
-  return obj;
+const toKeyValue = kv=>{
+    let parts = kv.split('=');
+    return {key:parts[0].trim(),value:parts[1].trim()};
 };
+const accumulate = (o,kv)=> {
+  o[kv.key] = kv.value;
+  return o;
+};
+
+
+// const toKeyValue =(obj,kv)=>{
+//   let parts = kv.split('=');
+//   obj[parts[0].trim()] = parts[1].trim();
+//   return obj;
+// };
 
 const parseBody=(text)=>{
-  return text && text.split('&').reduce(toKeyValue,{}) || {};
+  return text && text.split('&').map(toKeyValue).reduce(accumulate,{}) || {};
 };
-
-const parseCookies=(text)=>{
-  try{
-    return text ? text.split(';').reduce(toKeyValue,{}) : {};
+const parseCookies = text=> {
+  try {
+    return text && text.split(';').map(toKeyValue).reduce(accumulate,{}) || {};
   }catch(e){
+    console.log('catching');
     return {};
   }
-};
+}
+
+
+// const parseCookies=(text)=>{
+//   try{
+//     // console.log(text);
+//     return text ? text.split(';').reduce(toKeyValue,{}) : {};
+//   }catch(e){
+//     return {};
+//   }
+// };
 
 const initialize=function(){
   this._handler=new Handler();
@@ -60,11 +80,10 @@ const postProcess = function(handler){
 };
 
 const main = function(req,res){
-  console.log(req.headers);
   res.redirect=redirect.bind(res);
   req.urlIsOneOf=urlIsOneOf.bind(req);
   debugger;
-  req.cookies = parseCookies(req,req.headers.cookie) || '';
+  req.cookies = parseCookies(req.headers.cookie) || '';
   let content="";
   req.on('data',data=>content+=data.toString())
   req.on('end',()=>{
