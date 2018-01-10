@@ -6,20 +6,10 @@ const timeStamp = require('./time.js').timeStamp;
 const http = require('http');
 const WebApp = require('./webapp');
 let toS = o=>JSON.stringify(o,null,2);
-const registered_users=[
-  {
-    'userName' : "sayima",
-    'password' : "12345"
-  },
-  {
-    'userName' : "pragya",
-    'password' : "12345"
-  },
-  {
-    'userName' : "pavani",
-    'password' : "12345"
-  }
-];
+const getRegisteredUser=function(){
+  const registered_users=JSON.parse(fs.readFileSync('registeredusers.json','utf8'));
+  return registered_users;
+}
 
 let logRequest = (req,res)=>{
   let text = ['------------------------------',
@@ -34,6 +24,7 @@ let logRequest = (req,res)=>{
 };
 
 let loadUser = (req,res)=>{
+  let registered_users=getRegisteredUser();
   let sessionid = req.cookies.sessionid;
   let user = registered_users.find(u=>u.sessionid==sessionid);
   if(sessionid && user){
@@ -62,6 +53,8 @@ const getData=(req,res)=>{
 };
 
 const handlePostLogin =(req,res)=>{
+  let registered_users=getRegisteredUser();
+  console.log(registered_users);
   let user = registered_users.find(u=>u.userName==req.body.userName);
   if(!user) {
     res.redirect('/login.html');
@@ -69,6 +62,8 @@ const handlePostLogin =(req,res)=>{
   }
   let sessionid = new Date().getTime();
   user.sessionid = sessionid;
+
+  fs.writeFileSync('registeredusers.json',toS(registered_users));
   res.setHeader('Set-Cookie',`sessionid=${sessionid}`);
   res.redirect('/guestbook.html');
 };
