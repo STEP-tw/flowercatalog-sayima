@@ -14,7 +14,6 @@ let getComments=()=>{
   function loadComments(){
     let comments=JSON.parse(this.response);
     document.querySelector('#commentDiv').innerHTML = getFormattedComments(comments);
-    console.log(this.response);
   }
   var oReq = new XMLHttpRequest();
   oReq.addEventListener("load", loadComments);

@@ -6,7 +6,7 @@ const handlerForGetGuestBook = function(req,res){
   if(req.user){
     let nameAndbutton=`${req.user.userName}<br><br>
     <a type="button" href="/logout" >Logout!</a>`
-    let fileData=fileContent.replace(/Friend/,nameAndbutton);
+    let fileData=fileContent.replace('Friend<br><br><a type="button" href="/login.html" >LogIn</a>',nameAndbutton);
     res.write(fileData);
     res.end();
     return;
@@ -38,7 +38,6 @@ const handlerForPostGuestBook = function(req,res){
   addUserData(req);
   res.writeHead(302,{'Content-Type':'text/html','Location':'guestbook.html'});
   res.end();
-
 };
 
 exports.handlerForGetGuestBook=handlerForGetGuestBook;
