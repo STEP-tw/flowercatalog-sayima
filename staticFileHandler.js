@@ -1,5 +1,4 @@
 let fs = require('fs');
-
 const isFile = function(path){
   try{
     let stat= fs.statSync(path);

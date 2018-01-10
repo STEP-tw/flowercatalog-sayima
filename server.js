@@ -6,10 +6,11 @@ const timeStamp = require('./time.js').timeStamp;
 const http = require('http');
 const WebApp = require('./webapp');
 let toS = o=>JSON.stringify(o,null,2);
+
 const getRegisteredUser=function(){
   const registered_users=JSON.parse(fs.readFileSync('registeredusers.json','utf8'));
   return registered_users;
-}
+};
 
 let logRequest = (req,res)=>{
   let text = ['------------------------------',
@@ -36,10 +37,6 @@ let redirectLoggedInUserToHome = (req,res)=>{
   if(req.urlIsOneOf(['/login.html']) && req.user) res.redirect('/guestbook.html');
 };
 
-let redirectLoggedOutUserToHome = (req,res)=>{
-  if(req.urlIsOneOf(['/logout']) && !req.user) res.redirect('/index.html');
-};
-
 const handleSlash=(req,res)=>{
   let url=req.user ?'/guestbook.html':'/index.html';
   res.redirect(url);
@@ -54,7 +51,6 @@ const getData=(req,res)=>{
 
 const handlePostLogin =(req,res)=>{
   let registered_users=getRegisteredUser();
-  console.log(registered_users);
   let user = registered_users.find(u=>u.userName==req.body.userName);
   if(!user) {
     res.redirect('/login.html');
@@ -70,16 +66,15 @@ const handlePostLogin =(req,res)=>{
 
 const handleLogout=(req,res)=>{
   if(req.user)
-    delete req.user.sessionid;
+    delete req.user;
   res.setHeader('Set-Cookie',`sessionid=0; Expires=${new Date(1).toUTCString()}`);
-  res.redirect('/index.html');
+  res.redirect('/guestbook.html');
 };
 
 let app = WebApp.create();
 app.use(logRequest);
 app.use(loadUser);
 app.use(redirectLoggedInUserToHome);
-app.use(redirectLoggedOutUserToHome);
 app.get('/',handleSlash);
 app.post('/login',handlePostLogin);
 app.get('/guestbook.html',handlerForGetGuestBook);
