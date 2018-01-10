@@ -4,7 +4,9 @@ const handlerForGetGuestBook = function(req,res){
   res.writeHead(200,{'Content-Type':'text/html'});
   let fileContent=fs.readFileSync('./public/guestbook.html','utf8');
   if(req.user){
-    let fileData=fileContent.replace(/User/,req.user.userName);
+    let nameAndbutton=`${req.user.userName}<br><br>
+    <a type="button" href="/logout" >Logout!</a>`
+    let fileData=fileContent.replace(/Friend/,nameAndbutton);
     res.write(fileData);
     res.end();
     return;
@@ -38,8 +40,6 @@ const handlerForPostGuestBook = function(req,res){
   res.end();
 
 };
-
-
 
 exports.handlerForGetGuestBook=handlerForGetGuestBook;
 exports.handlerForPostGuestBook=handlerForPostGuestBook;
