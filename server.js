@@ -64,7 +64,6 @@ const getData=(req,res)=>{
 const handlePostLogin =(req,res)=>{
   let user = registered_users.find(u=>u.userName==req.body.userName);
   if(!user) {
-    res.setHeader('Set-Cookie',`logInFailed=true`);
     res.redirect('/login.html');
     return;
   }
