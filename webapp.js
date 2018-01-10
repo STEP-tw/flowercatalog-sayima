@@ -28,13 +28,6 @@ const accumulate = (o,kv)=> {
   return o;
 };
 
-
-// const toKeyValue =(obj,kv)=>{
-//   let parts = kv.split('=');
-//   obj[parts[0].trim()] = parts[1].trim();
-//   return obj;
-// };
-
 const parseBody=(text)=>{
   return text && text.split('&').map(toKeyValue).reduce(accumulate,{}) || {};
 };
@@ -42,20 +35,9 @@ const parseCookies = text=> {
   try {
     return text && text.split(';').map(toKeyValue).reduce(accumulate,{}) || {};
   }catch(e){
-    console.log('catching');
     return {};
   }
 }
-
-
-// const parseCookies=(text)=>{
-//   try{
-//     // console.log(text);
-//     return text ? text.split(';').reduce(toKeyValue,{}) : {};
-//   }catch(e){
-//     return {};
-//   }
-// };
 
 const initialize=function(){
   this._handler=new Handler();

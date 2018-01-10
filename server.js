@@ -15,20 +15,6 @@ let toS = o=>JSON.stringify(o,null,2);
     }
   ];
 
-const getAllComments = function(commentsFileContent=fs.readFileSync('comments.json','utf8')){
-  let commentsData=JSON.parse(commentsFileContent);
-  let content=`<pre>`;
-  commentsData.map(function(element){
-    content+=`
-    Date:${element.date}
-    Name:${element.name}
-    Comment:${element.comment} <br><br>`;
-  });
-  content+=`</pre>`;
-  return content;
-};
-const allComments=getAllComments();
-
 let logRequest = (req,res)=>{
   let text = ['------------------------------',
     `${timeStamp()}`,
@@ -93,23 +79,16 @@ let getContentType = function(path){
   return 'text/plain';
 };
 
-const setSessionIdForUser= function(user,sessionid){
-
-};
-
 const handlerForGetGuestBook = function(req,res){
   res.writeHead(200,{'Content-Type':'text/html'});
   let fileContent=fs.readFileSync('./public/guestbook.html','utf8');
-  let commentsFileContent=fs.readFileSync('comments.json','utf8');
-  comments=getAllComments(commentsFileContent);
-  const newfileContent=fileContent.replace(/USER_COMMENT/,comments);
   if(req.user){
-    let fileData=newfileContent.replace(/User/,req.user.userName);
+    let fileData=fileContent.replace(/User/,req.user.userName);
     res.write(fileData);
     res.end();
     return;
   }
-  res.write(newfileContent);
+  res.write(fileContent);
   res.end();
 };
 const addToDataBase=function(commentsDetails){
@@ -132,8 +111,7 @@ const handlePostGuestBook = function(req,res){
     res.redirect('/login.html');
     return;
   }
-  console.log('req.user:',req.user);
-  console.log('data:',req.body);
+
   addUserData(req);
   res.writeHead(302,{'Content-Type':'text/html','Location':'guestbook.html'});
   res.end();
@@ -143,6 +121,13 @@ const handlePostGuestBook = function(req,res){
 const handleSlash=(req,res)=>{
   let url=req.user ?'/guestbook.html':'/index.html';
   res.redirect(url);
+};
+
+const getData=(req,res)=>{
+  res.writeHead(200,{'content-type':'text/javascript'});
+  let commentsData=JSON.parse(fs.readFileSync('comments.json','utf8'));
+  res.write(toS(commentsData));
+  res.end();
 };
 
 let app = WebApp.create();
@@ -169,6 +154,7 @@ app.post('/login',(req,res)=>{
 app.get('/guestbook.html',handlerForGetGuestBook);
 
 app.post('/guestbook',handlePostGuestBook);
+app.get('/comments',getData);
 
 app.get('/logout',(req,res)=>{
   res.setHeader('Set-Cookie',[`loginFailed=false,Expires=${new Date(1).toUTCString()}`,`sessionid=0,Expires=${new Date(1).toUTCString()}`]);
